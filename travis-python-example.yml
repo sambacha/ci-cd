@@ -1,0 +1,51 @@
+language: python
+cache: pip
+
+matrix:
+  include:
+    - python: '2.7'
+    - python: '3.5'
+    - python: '3.6'
+    # Docker dev image
+    - sudo: required
+      services:
+        - docker
+      env:
+        - IMAGE_NAME=testblogorganization/hello
+        - REGISTRY_USER=testblogdeploy
+        # REGISTRY_PASS=...
+        - secure: "PMt0Y2cmVNEPbw7az9QajOYU4iPgidbuKxUn0n/In+i2AHZVGyYlTz/QAENLrheiz/Bndj8b9muuAiiKdC2EPohlhzfhXjV0CvS4Nf5ZsDQYBADKzaS0nNINXvxz2UDv6qXwumHoeCmhZSYH1dv/HspubaV5WLXeqC4PZLIqgS8CWMX1bdrJ8DQbXv76yLQ4jSgKrp9wYEt2x+MJJ9x0P4P/rnPSlouGcpaBCh9tksvemdJPnUy8C89wwHAw+KRflX1KvbfmKsSpBBCVHGOWFhkqLSXouk8aXIEN5GTrBoR4UFlRsPJ6kWXQsVgCk8JHcEGe361Osr+9vsOK8FSDsySl3TDYeTZY/3tKg4DUZFa+oAbcHVmh9M9sq0kMpG9WopIBF5YUoJYRa2WWsSqBnPimhtZOyBzi8CzEcniwjtJkRvtfdn+DJYSku5ZEzMq9sVHccGaEJ/rN4TB/CEtZauAXS51uNbn1GZg0CcdmPrjkQulXGvwXR/oXOdzCDOIZucqbmTeCeC0Pl3KoY/s869JdqvdERgslk3mKGhlvDATE9hKJ5NxZcrqYSt68JVUa8+ansQP3LWHaFtOLub/8KHTbpQgDCF53Ld5LjHDsdpmJPA9ZOC8vaybrGXQ+J2i79yLsK/tFefH2UN4yurrJe23BCPKNePKoeBYScE9WLaE="
+
+      before_install:
+        - sudo apt-get update
+        - sudo apt-get install -y -o Dpkg::Options::="--force-confold" docker-engine
+      install: []
+
+      before_script:
+        - docker pull "${IMAGE_NAME}:develop" || true
+      script:
+        - docker build --pull --cache-from "${IMAGE_NAME}:develop" --tag "$IMAGE_NAME" .
+
+      before_deploy:
+        - docker login -u "$REGISTRY_USER" -p "$REGISTRY_PASS"
+        - git_sha="$(git rev-parse --short HEAD)"
+        - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:develop"
+        - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-develop"
+      deploy:
+        provider: script
+        script: docker push "${IMAGE_NAME}:develop" && docker push "${IMAGE_NAME}:${git_sha}-develop"
+        on:
+          branch: develop
+
+install: pip install -r requirements-dev.txt
+
+script: pytest
+
+deploy:
+  provider: pypi
+  user: testblogdeploy
+  password:
+    secure: "EaP16sz1GEb2XCcYxz6wHadeOMSbWxE5r2DQleJKDvmqxAPTqS5CcyKsItd8Ry1D0cbFavSnfEQK2knhaWAgQODe3la5FkQhpY1w+97QYx+f1kfvYuiM7enMmH9Kvzh/Kd8UDNk7BiLlzYBaRQifNoQmfG+OlBkIlv7e/Yl5WHbOxN4l9SREGrN2VjBKs2Gp8Q3qXvYuRkOw5FL+w2IIRd3rdlhAcwoLa9OlI53RJSARI/TFZnjChQwfRLcHh14eeqhf9I8/9QebUGrSNrYqSuedR02ffFKLUhBFDJVQW4I8tfvW93LwQ/8YVCdgiGtq5M5GuhAwD1RgPOR/Gknf9Fr84i4hT8gXvMNvv3T2YbfqgGRpXH+u8YY/ZGYhdyBR4jXmWmvHIw1zqAbQmsd/EYcpqo+18JDmz/LwYqaVNAZ+VrLySoJbGHIN82rXU8VM3fwmvcsHwerM0JVwxoVVPXdczmclX8RZ1rm2gIAx4QMk9hntUmPbwzkgmPxTlGYnNV8lm1S264J4t6Ro+Ms1VnMkF4ld6XUN2oPoYYd/OBMbwAVqRgtGXpwTpOUA/L8whlnnhd97aIked2TrnI7J9rNe/q7BdJCkEK4KO0Ap5h/EbS9sYRSKPKuf4IfC0gpDW4ROG2pHCX33U6/oux2LikjCLFDN3ZJLzUcKkp+qvyo="
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
