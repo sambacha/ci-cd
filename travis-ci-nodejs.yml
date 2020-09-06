@@ -1,7 +1,17 @@
+# travis-ci
+os: linux
+dist: xenial
 sudo: true
+
 language: node_js
 node_js:
-- node
+- '10'
+- '12'
+
 git:
   quiet: true
-cache: npm
+#cache: npm
+
+install: npm install && npm install --package-lock-only
+
+scripts: npm run-script test
