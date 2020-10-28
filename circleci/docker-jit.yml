@@ -1,0 +1,22 @@
+# circleci build 
+# bash script invokes a Makefile triggering the build 
+# $ circle-ci-docker.sh
+# $ make || exit 0
+
+version: 2
+jobs:
+  build:
+    machine: true
+    steps:
+      - checkout
+      - restore_cache:
+          key: docker-{{ checksum "Dockerfile" }}
+      - run:
+          # command: if [[ -e ~/docker/image.tar ]]; then docker load --input ~/docker/image.tar; else docker build -t ${REPO} . && { mkdir -p ~/docker; docker save ${REPO} > ~/docker/image.tar ; } ; fi
+          command: docker build -t ${REPO} . && { mkdir -p ~/docker; docker save ${REPO} > ~/docker/image.tar ; }
+      - save_cache:
+          key: docker-{{ checksum "Dockerfile" }}
+          paths:
+            - ~/docker
+      - run:
+          command: docker run -it -v $(pwd):/root/${REPO} ${REPO} bash -c 'cd /root/${REPO} ; ./circleci-build.sh'
