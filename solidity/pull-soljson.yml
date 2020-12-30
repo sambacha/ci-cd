@@ -59,7 +59,7 @@ jobs:
           echo "::set-env name=VERSION_ALREADY_EXISTS::${version_already_exists}"
           echo "::set-env name=BUILD_NUM::${build_num}"
       - name: Get artifact URL using CircleCI API
-        if: "!env.VERSION_ALREADY_EXISTS"
+        if: '!env.VERSION_ALREADY_EXISTS'
         run: |
           artifacts_endpoint="https://circleci.com/api/v1.1/project/github/ethereum/solidity/${BUILD_NUM}/artifacts"
           artifact_url=$(
@@ -68,7 +68,7 @@ jobs:
           )
           echo "::set-env name=ARTIFACT_URL::${artifact_url}"
       - name: Download the binary from CircleCI
-        if: "!env.VERSION_ALREADY_EXISTS"
+        if: '!env.VERSION_ALREADY_EXISTS'
         run: |
           # TMP:
           #curl --silent --show-error --location --create-dirs --output "$NIGHTLY_PATH" "$ARTIFACT_URL"
@@ -79,17 +79,17 @@ jobs:
           # TODO: Add a symlink under wasm/ if it's a tagged commit
           # [ "$TRAVIS_BRANCH" = release ] && ln -sf ../bin/"$NEWFILE" ./wasm/"$NEWFILE"
       - name: Install dependencies of the update script using npm
-        if: "!env.VERSION_ALREADY_EXISTS"
+        if: '!env.VERSION_ALREADY_EXISTS'
         run: |
           npm install
       - name: Run the script that updates the file lists
-        if: "!env.VERSION_ALREADY_EXISTS"
+        if: '!env.VERSION_ALREADY_EXISTS'
         run: |
           # FIXME: Since we do no check out old binaries, the script will clear the lists.
           # Modify it to just append the new nightly instead.
           npm run update
       - name: Commit the nightly binary and updated lists
-        if: "!env.VERSION_ALREADY_EXISTS"
+        if: '!env.VERSION_ALREADY_EXISTS'
         run: |
           # TODO: Commit any wasm and release changes too
           git add "bin/soljson-$NIGHTLY_VERSION.js"
@@ -99,6 +99,6 @@ jobs:
           git add bin/list.txt
           git commit -m "Nightly build ${NIGHTLY_VERSION}"
       - name: Push the commit
-        if: "!env.VERSION_ALREADY_EXISTS"
+        if: '!env.VERSION_ALREADY_EXISTS'
         run: |
           git push origin "$TARGET_BRANCH"

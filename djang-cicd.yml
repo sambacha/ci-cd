@@ -14,7 +14,6 @@ on:
       - master
       - develop
 
-
 # three job definition
 jobs:
   health-check-job: # health check job for testing and code formatting check

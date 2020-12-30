@@ -10,7 +10,7 @@ aliases:
   - &defaults
     docker:
       - image: circleci/node:10.12 # Docker Node 10.12 image.
- 
+
   # Alias for installing npm, if necessary (hence the name)
   - &npm_install_if_necessary
     run:
@@ -21,9 +21,9 @@ aliases:
           # Perform a clean npm install
           npm ci
         fi
-  # Alias for caching - caches node dependencies with a cache key
       # template for an environment variable,
       # see circleci.com/docs/2.0/caching/
+  # Alias for caching - caches node dependencies with a cache key
   - &cache_key_node_modules
     key: v1-node_modules-{{ checksum "package-lock.json" }}
 
@@ -57,7 +57,7 @@ jobs:
       - restore_cache:
           <<: *cache_key_node_modules
       - *npm_install_if_necessary
-      - run: 
+      - run:
           name: Run development blockchain
           command: npm run chain
           background: true

@@ -1,5 +1,4 @@
 ---
-
 # GitHub Action for Branchs Workflows
 on:
   # Trigger the workflow on push or pull request,

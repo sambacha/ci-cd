@@ -6,21 +6,21 @@ jobs:
   build:
     runs-on: 'ubuntu-latest'
     steps:
-    - uses: actions/checkout@master
-      name: Checkout-source
-      with:
-        ref: $GIT_COMMIT
+      - uses: actions/checkout@master
+        name: Checkout-source
+        with:
+          ref: $GIT_COMMIT
 
-    - name: Build-package-with-Oryx
-      timeout-minutes: 60
-      run:  docker run --volume $(pwd):/repo --volume /home/runner/outputfolder:/output --env PRE_BUILD_COMMAND='dotnet run --project .github/workflows/PrebuildLogic.csproj && chmod +x /repo/.github/workflows/terrapin-prebuild && /repo/.github/workflows/prebuild && rm -rf /repo/.github/workflows/ && rm -rf /repo/.azure-pipelines/umask 0 && npm config set cache /tmp/.npm' mcr.microsoft.com/oryx/build:latest oryx build --package /repo/ --output /output -p registry=https://registry.npmjs.org
+      - name: Build-package-with-Oryx
+        timeout-minutes: 60
+        run: docker run --volume $(pwd):/repo --volume /home/runner/outputfolder:/output --env PRE_BUILD_COMMAND='dotnet run --project .github/workflows/PrebuildLogic.csproj && chmod +x /repo/.github/workflows/terrapin-prebuild && /repo/.github/workflows/prebuild && rm -rf /repo/.github/workflows/ && rm -rf /repo/.azure-pipelines/umask 0 && npm config set cache /tmp/.npm' mcr.microsoft.com/oryx/build:latest oryx build --package /repo/ --output /output -p registry=https://registry.npmjs.org
 
-    - uses: jikuma/githubaction@v0.3.3-alpha
-      name: Create-release
-      with:
-        operation: 'create a release'
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        release_title: '06-30-2020-22-37-27'
-        release_note: 'Job: 06-30-2020-22-37-27 | Package: xtend@4.0.2 | Manager: Npm | Commit: ${{ github.sha }}'
-        asset_filepath: '/home/runner/outputfolder/xtend-4.0.2.tgz'
-        tag_name: v4.0.2+${{ github.sha }}
+      - uses: jikuma/githubaction@v0.3.3-alpha
+        name: Create-release
+        with:
+          operation: 'create a release'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          release_title: '06-30-2020-22-37-27'
+          release_note: 'Job: 06-30-2020-22-37-27 | Package: xtend@4.0.2 | Manager: Npm | Commit: ${{ github.sha }}'
+          asset_filepath: '/home/runner/outputfolder/xtend-4.0.2.tgz'
+          tag_name: v4.0.2+${{ github.sha }}

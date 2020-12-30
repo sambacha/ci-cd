@@ -1,5 +1,5 @@
-# circleci build 
-# bash script invokes a Makefile triggering the build 
+# circleci build
+# bash script invokes a Makefile triggering the build
 # $ circle-ci-docker.sh
 # $ make || exit 0
 

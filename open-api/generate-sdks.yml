@@ -1,11 +1,10 @@
-
 name: generate-sdks
 
 on:
   push:
     paths:
-      - "src/openapi.yaml"
-      - ".github/workflows/generate-sdks.yml"
+      - 'src/openapi.yaml'
+      - '.github/workflows/generate-sdks.yml'
     branches:
       - '**'
   workflow_dispatch:

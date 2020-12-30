@@ -6,15 +6,13 @@ on:
       - master
 
 jobs:
-
   test-node:
-
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        node-version: [ 8.x, 10.x, 12.x, 13.x ]
+        node-version: [8.x, 10.x, 12.x, 13.x]
 
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
@@ -37,15 +35,13 @@ jobs:
       - name: Run tests
         run: npm run test-node
 
-
   test-browser:
-
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        module: [ 'esm', 'umd' ]
+        module: ['esm', 'umd']
 
     steps:
       - uses: actions/setup-node@v1
@@ -68,7 +64,6 @@ jobs:
         run: npm run test-browser-${{ matrix.module }}
 
   test-react-native:
-
     runs-on: macos-latest
 
     # Temporary for testing CI
@@ -95,9 +90,7 @@ jobs:
       - name: Run tests
         run: npm run test-react
 
-
   coverage:
-
     name: Coverage
 
     runs-on: ubuntu-latest
