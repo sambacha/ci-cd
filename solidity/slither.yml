@@ -1,0 +1,44 @@
+name: slither 
+
+on:
+  push:
+    branches: [ develop ]
+    paths:
+      - 'contracts/**' 
+  pull_request:
+    branches: [ 'develop', 'ci/*' ]
+    paths:
+      - 'contracts/**' 
+
+jobs:
+  slither:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1.4.4
+      - uses: actions/setup-python@v2
+      - name: Install truffle
+        run:  |
+          cd contracts
+          npm install truffle
+      - name: Install Slither
+        run: pip3 install slither-analyzer
+      - name: Prepare output
+        run: |
+          mkdir output
+      - name: Run analysis
+        shell: bash
+        run: |
+          slither ./contracts --filter-paths "openzeppelin|test" --exclude naming-convention >>output/slither_report.txt 2>&1 || true
+      - name: Store the report
+        uses: actions/upload-artifact@v2
+        with:
+          name: slither-report
+          path: output/slither_report.txt
+      - name: Check status
+        shell: bash
+        run: |
+          FALSE_POSITIVE_WARNIGNS=7
+          FOUND_WARNINGS=`grep "\d+ result" -Po output/slither_report.txt | sed 's/ result//g'`
+          echo "Slither has found $FOUND_WARNINGS issues"
+          if [[ $FOUND_WARNINGS -gt $FALSE_POSITIVE_WARNIGNS ]]; then echo "$FOUND_WARNINGS issues exceeds limit" >&2; exit 1; fi
