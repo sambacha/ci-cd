@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['12.x']
+        node-version: ['14.x']
 
     steps:
       - uses: actions/checkout@v2
@@ -20,8 +20,17 @@ jobs:
           check-latest: true
       - name: npm install, build, and test
         run: |
-          npm install codecov -g
           npm install
-          codecov
+          npm run build
+          npm run test
         env:
           CI: true
+      - uses: actions/setup-node@v2
+        with:
+          registry-url: 'https://npm.pkg.github.com'
+          # Defaults to the user or organization that owns the workflow file
+          scope: '@$GITHUB_ORG'
+      # Publish to GitHub Packages
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
