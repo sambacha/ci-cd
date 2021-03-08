@@ -1,0 +1,36 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    name: Publish to Github & NPM or Github Package Registry
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - env:
+          CI: true
+        run: npm ci
+      - name: OpenAPI Test 
+        env:
+          CI: true
+          GH_TOKEN: "${{ secrets.GH_TOKEN }}"
+          GITHUB_HEAD_REF: $GITHUB_HEAD_REF
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          NPM_TOKEN: "${{ secrets.NPM_TOKEN }}"
+        run: |
+            echo "//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" > /home/runner/work/_temp/.npmrc
+            npx semantic-release --dry-run --debug -b $GITHUB_HEAD_REF
+      - if: success()
+        env:
+          CI: true
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx semantic-release
