@@ -1,4 +1,4 @@
-name: yarn
+name: nodejs
 
 on: ['push']
 
@@ -8,12 +8,12 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['12.x']
+        node-version: ['14.x']
 
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@latest
+        uses: actions/setup-node@v2.1.5
         with:
           node-version: ${{ matrix.node-version }}
       - name: Get yarn cache directory path
@@ -31,6 +31,6 @@ jobs:
       - name: webpage install, build, and test
         uses: actions/setup-node@v2.1.5
       - run: |
-          cd website/
           yarn
           yarn run build
+          yarn run test
