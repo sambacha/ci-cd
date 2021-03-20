@@ -1,7 +1,8 @@
 # CI for command line NodeJS Applications
-name: nodejs-ci
-on: ['push']
-    paths:
+name: nodejs
+on:
+  push:
+     paths:
       - "**/**"
       - "!**/*.md/**"
 
@@ -30,7 +31,7 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Install npm dependencies
-        run: npm install
+        run: cd src/client && npm install
 
       - name: Run build
         run: npm run build
