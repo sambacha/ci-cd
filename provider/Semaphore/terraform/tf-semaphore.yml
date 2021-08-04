@@ -1,0 +1,22 @@
+version: v1.0
+name: Initial Pipeline
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: 'Init'
+    task:
+      secrets:
+        - name: terraform-key
+        - name: gcp
+      jobs:
+        - name: 'Init Terraform Gcloud'
+          commands:
+            - checkout
+            - chmod 0600 ~/.ssh/id_rsa_semaphore_terraform
+            - cd gcloud
+            - terraform init
+            - terraform plan
+            - terraform apply -auto-approve
+            - terraform show terraform.tfstate
