@@ -1,0 +1,76 @@
+name: ci
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+
+jobs:
+#  qa:
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        env:
+#          - TOXENV: checkqa
+#          - TOXENV: readme
+#    steps:
+#      - uses: actions/checkout@master
+#      - name: Set up Python ${{ matrix.python-version }}
+#        uses: actions/setup-python@v1
+#        with:
+#          python-version: 3.8
+#      - name: Set PY
+#        run: echo "::set-env name=PY::$(python -VV | sha256sum | cut -d' ' -f1)"
+#      - uses: actions/cache@v1
+#        with:
+#          path: ~/.cache/pre-commit
+#          key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+#      - name: Install tox
+#        run: pip install tox
+#      - name: Test with tox ${{ matrix.env.TOXENV }}
+#        env: ${{ matrix.env }}
+#        run: tox
+
+  tests:
+#    needs: [qa]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: [2.7, 3.5, 3.6, 3.7, 3.8]
+        # NOTE: keep this in sync with envlist in tox.ini
+        env:
+          - TOXENV: piplatest-coverage
+          - TOXENV: pip20.0-coverage
+          - TOXENV: pip19.3-coverage
+#          - TOXENV: pip19.2.3-coverage
+#          - TOXENV: pip19.1-coverage
+#          - TOXENV: pip19.0.3-coverage
+#          - TOXENV: pip18.0-coverage
+#          - TOXENV: pip10.0.1-coverage
+#          - TOXENV: pip9.0.3-coverage
+#          - TOXENV: pip9.0.1-coverage
+#          - TOXENV: pip8.1.1-coverage
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@master
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install tox
+        run: pip install tox
+      - name: Test with tox ${{ matrix.env.TOXENV }}
+        env: ${{ matrix.env }}
+        run: tox
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage.xml
+          name: py${{ matrix.python-version }}-${{ matrix.env.TOXENV }}-${{ matrix.os }}
+          # It's no big deal to leak the codecov token since
+          # it's only using for upload reports. See also:
+          #   https://github.com/codecov/codecov-action/issues/11
+          #   https://github.com/codecov/codecov-python/issues/209
+          token: 0fb9464e-0726-4927-b941-b2253e62e833
