@@ -1,0 +1,22 @@
+# GinkGO Test 
+name: ginkgo
+on: [push, pull_request]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        go-version: [1.15.x]
+        platform: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go-version }}
+    - name: Install Ginkgo
+      run: go get -u github.com/onsi/ginkgo/ginkgo
+    - name: Test
+      run: ginkgo -cover ./...
