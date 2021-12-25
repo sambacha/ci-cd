@@ -6,9 +6,26 @@ on:
     - master
     types: [opened, synchronize, closed]
 
+defaults:
+  run:
+    shell: bash
+      
+env:
+  CI: true
+  FORCE_COLOR: 2
+
+        
 jobs:
-  check_labels:
-    runs-on: ubuntu-18.04
+  pipeline:
+    name: Node ${{ matrix.node }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+   
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['14.x']
+        os: ['ubuntu-latest']
+        
     steps:
     - name: debug
       if: contains(github.event.pull_request.labels.*.name, 'debug')
