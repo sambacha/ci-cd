@@ -1,0 +1,46 @@
+#!/usr/bin/env just --justfile
+# Rust Justfile
+
+alias t := test
+
+alias c := check
+
+bt := '0'
+
+export RUST_BACKTRACE := bt
+
+log := "warn"
+
+export JUST_LOG := log
+
+test:
+  cargo ltest
+
+fuzz:
+  cargo +nightly fuzz run fuzz-compiler
+
+run:
+  cargo run
+
+# only run tests matching PATTERN
+filter PATTERN:
+  cargo ltest {{PATTERN}}
+
+build:
+  cargo lbuild
+
+fmt:
+  cargo fmt --all
+
+# everyone's favorite animate paper clip
+clippy:
+  cargo lclippy --all --all-targets --all-features
+
+# Print working directory, for demonstration purposes!
+pwd:
+  echo {{invocation_directory()}}
+
+# Local Variables:
+# mode: makefile
+# End:
+# vim: set ft=make :
