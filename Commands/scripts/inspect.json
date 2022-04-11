@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "inspect:sanity-testing": "mocha **/**--test.js --grep \"sanity\"",
+    "inspect:lint": "eslint .",
+    "inspect:vulnerabilities": "npm audit",
+    "inspect:license": "license-checker --failOn GPLv2",
+    "inspect:complexity": "plato .",
+    "inspect:all": "concurrently -c \"bgBlue.bold,bgMagenta.bold,yellow\" \"npm:inspect:quick-testing\" \"npm:inspect:lint\" \"npm:inspect:vulnerabilities\" \"npm:inspect:license\""
+    }
+  }
