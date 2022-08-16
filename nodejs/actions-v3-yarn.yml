@@ -5,6 +5,11 @@ on:
      paths:
       - "**/**"
       - "!**/*.md/**"
+
+defaults:
+  run:
+    shell: bash
+
 env:
   CI: ''
   COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
